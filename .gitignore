@@ -1,2 +1,4 @@
 nbactions.xml
 nbproject/project.properties
+/nbproject/
+/target/
