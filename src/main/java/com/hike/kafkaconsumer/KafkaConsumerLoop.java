@@ -5,11 +5,16 @@ package com.hike.kafkaconsumer;
  * @author siddharthasingh
  */
 import com.hike.kafkaconsumer.config.KafkaConsumerConfiguration;
+import com.hike.kafkaconsumer.config.Services;
 import com.hike.kafkaconsumer.enums.SubjectEnum;
 import com.hike.kafkaconsumer.resources.ShutDownHookApi;
+import com.hike.kafkaconsumer.resources.UserAPI;
 import com.hike.kafkaconsumer.subject.Subject;
 import com.hike.kafkaconsumer.subject.SubjectFactory;
+import com.hike.rdbms.dao.UserDAO;
 import io.dropwizard.Application;
+import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.servlets.tasks.LogConfigurationTask;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
@@ -19,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,13 +60,24 @@ public class KafkaConsumerLoop extends Application<KafkaConsumerConfiguration> {
     }
 
     @Override
-    public void run(KafkaConsumerConfiguration configuration, Environment environment) {
+    public void run(KafkaConsumerConfiguration configuration, Environment environment) throws ClassNotFoundException {
 
+        // curl -X POST -d "logger=com.hike.kafkaconsumer.resources&level=" http://localhost:8112/tasks/log-level
+        environment.admin().addTask(new LogConfigurationTask());
 //        environment.admin().addTask(new EchoTask());
-
         environment.jersey().register(new ShutDownHookApi());
 
-        start(configuration, environment);
+        Services services = configuration.getServices();
+        if (services.getKafkaConsumer()) {
+            start(configuration, environment);
+        }
+
+        if (services.getDatabase()) {
+            final DBIFactory factory = new DBIFactory();
+            final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "mysql");
+            final UserDAO dao = jdbi.onDemand(UserDAO.class);
+            environment.jersey().register(new UserAPI(dao));
+        }
 
         JVMShutDownHook(configuration);
     }

@@ -11,8 +11,32 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <dropwizard.version>1.1.0</dropwizard.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <io.dropwizard.version>0.7.0-rc2</io.dropwizard.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.stuartgunter</groupId>
+            <artifactId>dropwizard-logging-config</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.dropwizard/dropwizard-jdbi -->
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-jdbi</artifactId>
+            <version>${io.dropwizard.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.codahale.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>6.0.6</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.smoketurner/dropwizard-swagger -->
         <dependency>
             <groupId>com.smoketurner</groupId>
@@ -152,8 +176,13 @@
                     <apiSources>
                         <apiSource>
                             <springmvc>false</springmvc>
-                            <locations>com.hike.kafkaconsumer.resources</locations>
-                            <schemes>http,https</schemes>
+                            <locations>
+                                <location>com.hike.kafkaconsumer.resources</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
                             <host>www.localhost:8111</host>
                             <basePath>/v1</basePath>
                             <info>

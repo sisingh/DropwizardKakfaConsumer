@@ -19,9 +19,54 @@
   "basePath" : "/v1",
   "tags" : [ {
     "name" : "ShutDownHookApi"
+  }, {
+    "name" : "UserAPI"
   } ],
   "schemes" : [ "http", "https" ],
   "paths" : {
+    "/v1/all_users_count" : {
+      "get" : {
+        "tags" : [ "UserAPI" ],
+        "summary" : "Total users",
+        "description" : "Gets count of all users",
+        "operationId" : "getAllUsersCount",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UserCount"
+            }
+          }
+        }
+      }
+    },
+    "/v1/create_user/age/{age}/name/{name}" : {
+      "post" : {
+        "tags" : [ "UserAPI" ],
+        "summary" : "User creation",
+        "description" : "This API creates user with age and name : passed in URI as well as in body",
+        "operationId" : "createUser",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "age",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "name",
+          "in" : "path",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "successful operation"
+          }
+        }
+      }
+    },
     "/v1/shut" : {
       "get" : {
         "tags" : [ "ShutDownHookApi" ],
@@ -40,6 +85,18 @@
           "default" : {
             "description" : "successful operation"
           }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "UserCount" : {
+      "type" : "object",
+      "required" : [ "count" ],
+      "properties" : {
+        "count" : {
+          "type" : "integer",
+          "format" : "int64"
         }
       }
     }

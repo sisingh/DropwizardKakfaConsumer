@@ -25,7 +25,49 @@ server:
 # Database settings.
 swagger:
   resourcePackage: com.hike.kafkaconsumer.resources
+
+# This project is a polyglot service which is highly customisable.
+# Set the value as true to enable the service and false to ignore
+# With database : true, it will connect to dataabase
+# kafkaConsumer : false, it will ignore connection to kafka as consumer
+services:
+    database : true
+    kafkaConsumer : false
     
+# Database settings.
+database:
+    # the name of the JDBC driver, mysql in our case
+    driverClass: com.mysql.jdbc.Driver
+    
+    # the username
+    user: abfl
+    
+    # the password
+    password: abfl
+    
+    # the JDBC URL; the database is called DWGettingStarted
+    url: jdbc:mysql://localhost:3306/abfl
+    
+    # the SQL query to run when validating a connection's liveness
+    validationQuery: "/* MyService Health Check */ SELECT 1"
+    
+    # the timeout before a connection validation queries fail
+#    validationQueryTimeout: 3s
+
+    # the minimum number of connections to keep open
+    minSize: 8
+
+    # the maximum number of connections to keep open
+    maxSize: 32
+    # whether or not idle connections should be validated
+    checkConnectionWhileIdle: false
+
+    # the amount of time to sleep between runs of the idle connection validation, abandoned cleaner and idle pool resizing
+    evictionInterval: 10s
+
+    # the minimum amount of time an connection must sit idle in the pool before it is eligible for eviction
+    minIdleTime: 1 minute
+
 kafkaConsumer:
   
   numberOfConsumers: 3
@@ -58,17 +100,9 @@ logging:
     - type: file
       threshold: INFO
       logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
-      currentLogFilename: /tmp/application.log
-      archivedLogFilenamePattern: /tmp/application-%d{yyyy-MM-dd}-%i.log.gz
+      currentLogFilename: /tmp/dropwizard_service.log
+      archivedLogFilenamePattern: /tmp/dropwizard_service-%d{yyyy-MM-dd}-%i.log.gz
       archivedFileCount: 7
       timeZone: UTC
       maxFileSize: 10MB
       archivedFileCount: 6
-
-#metrics:
-#  reporters:
-#    - type: graphite
-#      host: localhost
-#      port: 2003
-#      prefix: kafka_consumer
-#      frequency: 1m
